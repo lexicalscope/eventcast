@@ -27,7 +27,7 @@ import com.google.inject.spi.TypeListener;
 
 final class EventCastingModule extends AbstractModule {
     private final Set<TypeLiteral<?>> bindings;
-    private final EventCaster eventCaster = new EventCaster();
+    private final EventCasterImpl eventCaster = new EventCasterImpl();
 
     public EventCastingModule(final Set<TypeLiteral<?>> bindings) {
         this.bindings = bindings;
