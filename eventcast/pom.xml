@@ -91,7 +91,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                <includeDependency>false</includeDependency>
                     <options>
                         <option>-allowaccessmodification</option>
                         <option>-dontobfuscate</option>
@@ -100,6 +99,7 @@
                         <option>-dontwarn</option>
                         <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod</option>
                         <option>-keep public class com.lexicalscope.eventcast.* { public protected *; }</option>
+                        <option>-keep class com.lexicalscope.eventcast.* { public protected *; }</option>
                         <option>-keepclassmembernames class com.lexicalscope.eventcast.* { java.lang.Class class$(java.lang.String); java.lang.Class
                             class$(java.lang.String, boolean); }</option>
                         <option>-keepclassmembers enum com.lexicalscope.eventcast.* { public static **[] values(); public static **
@@ -107,6 +107,8 @@
                         <option>-keepclassmembers class com.lexicalscope.eventcast.* implements java.io.Serializable { static final long serialVersionUID;
                             private static final java.io.ObjectStreamField[] serialPersistentFields; private void writeObject(java.io.ObjectOutputStream);
                             private void readObject(java.io.ObjectInputStream); java.lang.Object writeReplace(); java.lang.Object readResolve(); }</option>
+                        <option>-keep public class com.google.inject.**.* { public protected *; }</option>
+                        <optiom>-keepattributes *Annotation*</optiom>                            
                     </options>
                     <libs>
                         <lib>${java.home}/lib/rt.jar</lib>

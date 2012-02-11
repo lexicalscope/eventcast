@@ -55,6 +55,7 @@ final class EventCastingModule extends AbstractModule {
             bindEventCast(listener);
         }
     }
+
     private <T> void bindEventCast(final TypeLiteral<T> listener) {
         bind(listener).toProvider(new EventCastProvider<T>(listener, eventCaster));
     }
