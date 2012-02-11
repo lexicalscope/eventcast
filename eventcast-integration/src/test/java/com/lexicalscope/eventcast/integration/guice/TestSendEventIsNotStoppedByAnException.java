@@ -1,5 +1,6 @@
 package com.lexicalscope.eventcast.integration.guice;
 
+import static com.lexicalscope.eventcast.EventCast.eventCastModuleBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -12,7 +13,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.lexicalscope.eventcast.EventCastModuleBuilder;
 import com.lexicalscope.eventcast.EventCastingExceptionListener;
 
 public class TestSendEventIsNotStoppedByAnException
@@ -86,7 +86,7 @@ public class TestSendEventIsNotStoppedByAnException
                 bind(Receiver.class);
                 bind(ThrowingReceiver.class);
                 bind(ExceptionReceiver.class);
-                install(new EventCastModuleBuilder().implement(MyEventListener.class).build());
+                install(eventCastModuleBuilder().implement(MyEventListener.class).build());
             }
         });
 

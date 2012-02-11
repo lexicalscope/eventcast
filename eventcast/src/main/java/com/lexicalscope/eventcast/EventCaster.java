@@ -31,7 +31,8 @@ import com.google.inject.TypeLiteral;
 
 class EventCaster {
     private final ThreadLocal<List<Event>> pending = new ThreadLocal<List<Event>>();
-    private final SetMultimap<Object, Object> listeners = synchronizedSetMultimap(LinkedHashMultimap.create());
+    private final SetMultimap<TypeLiteral<?>, Object> listeners = synchronizedSetMultimap(LinkedHashMultimap
+            .<TypeLiteral<?>, Object>create());
 
     void addListener(final TypeLiteral<?> interfaceType, final Object injectee) {
         listeners.put(interfaceType, injectee);
@@ -57,7 +58,8 @@ class EventCaster {
     }
 
     private void broadcastEvent(final Event event) throws Throwable {
-        for (final Object object : new ArrayList<Object>(listeners.get(event.listenerType))) {
+        final ArrayList<Object> listenersForThisEvent = new ArrayList<Object>(listeners.get(event.listenerType));
+        for (final Object object : listenersForThisEvent) {
             try {
                 event.method.invoke(object, event.args);
             } catch (final InvocationTargetException e) {
@@ -65,6 +67,12 @@ class EventCaster {
             } catch (final Exception e) {
                 fireExceptionDuringEventCast(event, object, e);
             }
+        }
+
+        if (listenersForThisEvent.isEmpty()
+                && !event.listenerType.equals(TypeLiteral.get(EventCastUnhandledListener.class)))
+        {
+            fireUnhandledEventCast(event);
         }
     }
 
@@ -77,5 +85,16 @@ class EventCaster {
                         "exceptionDuringEventCast",
                         new Class[] { Throwable.class, Type.class, Object.class, Method.class, Object[].class }),
                 new Object[] { e, event.listenerType.getType(), object, event.method, event.args });
+    }
+
+    private void fireUnhandledEventCast(final Event event)
+            throws Throwable,
+            NoSuchMethodException {
+        fire(
+                TypeLiteral.get(EventCastUnhandledListener.class),
+                EventCastUnhandledListener.class.getMethod(
+                        "unhandledEventCast",
+                        new Class[] { Type.class, Method.class, Object[].class }),
+                new Object[] { event.listenerType.getType(), event.method, event.args });
     }
 }

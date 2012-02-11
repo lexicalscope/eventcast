@@ -20,31 +20,25 @@ import java.lang.reflect.Type;
  */
 
 /**
- * Implement this interface to be notified of exceptions that occur during event
- * casting
+ * Implement this interface to be notified of events that are not handled by any
+ * listener
  * 
  * @author tim
  */
-public interface EventCastingExceptionListener {
+public interface EventCastUnhandledListener {
+
     /**
-     * Notified if an exception is thrown my an event listener during event
-     * casting
+     * Called when an event is not handled by any other listener
      * 
-     * @param cause
-     *            the exception the was thrown
      * @param listenerType
-     *            the type of listener that threw the exception
-     * @param listener
-     *            the listener that threw the exception
+     *            the type of listener that is missing
      * @param listenerMethod
-     *            the method that threw the exception
-     * @param eventArguments
-     *            the message that was being sent to the listener
+     *            the method that would have been called
+     * @param args
+     *            the message that would have been sent to the listener
      */
-    void exceptionDuringEventCast(
-            Throwable cause,
+    void unhandledEventCast(
             Type listenerType,
-            Object listener,
             Method listenerMethod,
-            Object[] eventArguments);
+            Object[] args);
 }

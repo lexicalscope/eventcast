@@ -1,5 +1,6 @@
 package com.lexicalscope.eventcast.integration.guice;
 
+import static com.lexicalscope.eventcast.EventCast.eventCastModuleBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
@@ -11,7 +12,6 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.lexicalscope.eventcast.EventCastModuleBuilder;
 
 public class TestRecursiveSendEventIsReordered
 {
@@ -97,7 +97,7 @@ public class TestRecursiveSendEventIsReordered
                 bind(FirstReceiver.class);
                 bind(SecondReceiver.class);
                 bind(ReceiverThatSendsFromFirstToSecond.class);
-                install(new EventCastModuleBuilder().
+                install(eventCastModuleBuilder().
                         implement(FirstEventListener.class).
                         implement(SecondEventListener.class).build());
             }

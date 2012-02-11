@@ -1,8 +1,5 @@
 package com.lexicalscope.eventcast;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 
@@ -22,23 +19,36 @@ import com.google.inject.TypeLiteral;
  * limitations under the License. 
  */
 
-public class EventCastModuleBuilder {
-    private final Set<TypeLiteral<?>> bindings = new LinkedHashSet<TypeLiteral<?>>();
+/**
+ * Bind listener interfaces to the EventCaster
+ * 
+ * @author tim
+ */
+public interface EventCastModuleBuilder {
+    /**
+     * The module should provide an implementation of the given listener
+     * 
+     * @param listener
+     *            the listener to implement
+     * 
+     * @return this
+     */
+    EventCastModuleBuilder implement(Class<?> listener);
 
-    public EventCastModuleBuilder() {
-        bindings.add(TypeLiteral.get(EventCastingExceptionListener.class));
-    }
+    /**
+     * The module should provide an implementation of the given listener
+     * 
+     * @param listener
+     *            the listener to implement
+     * 
+     * @return this
+     */
+    EventCastModuleBuilder implement(TypeLiteral<?> listener);
 
-    public EventCastModuleBuilder implement(final Class<?> source) {
-        return implement(TypeLiteral.get(source));
-    }
-
-    public EventCastModuleBuilder implement(final TypeLiteral<?> typeLiteral) {
-        bindings.add(typeLiteral);
-        return this;
-    }
-
-    public Module build() {
-        return new EventCastingModule(bindings);
-    }
+    /**
+     * Provide a guice module that implements all the registered listeners
+     * 
+     * @return a guice module that implements all the registered listeners
+     */
+    Module build();
 }
