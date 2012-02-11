@@ -10,7 +10,6 @@ import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
-import com.lexicalscope.eventcast.SendEventWithGuice.MyEventListener;
 
 /*
  * Copyright 2011 Tim Wood
@@ -31,7 +30,7 @@ import com.lexicalscope.eventcast.SendEventWithGuice.MyEventListener;
 public class EventCastModuleBuilder {
     private final Set<TypeLiteral<?>> bindings = new LinkedHashSet<TypeLiteral<?>>();
 
-    public EventCastModuleBuilder implement(final Class<MyEventListener> source) {
+    public EventCastModuleBuilder implement(final Class<?> source) {
         return implement(TypeLiteral.get(source));
     }
 
