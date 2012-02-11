@@ -1,4 +1,4 @@
-package com.lexicalscope.eventcast.integration;
+package com.lexicalscope.eventcast.integration.guice;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -9,7 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.lexicalscope.eventcast.EventCastModuleBuilder;
 
-public class TestSendEventWithGuice
+public class TestSendEvent
 {
     public interface MyEventListener {
         void eventOccured();

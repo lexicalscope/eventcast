@@ -1,7 +1,10 @@
-package com.lexicalscope.eventcast.integration;
+package com.lexicalscope.eventcast.integration.guice;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.Matchers.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -9,21 +12,21 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.lexicalscope.eventcast.EventCastModuleBuilder;
 
-public class TestSendEventWithArgumentsWithGuice
+public class TestSendEventIsBroadcast
 {
     public interface MyEventListener {
-        void eventOccured(Object argument);
+        void eventOccured(Object message);
     }
 
     public static class Receiver implements MyEventListener {
-        private Object argument;
+        private final List<Object> messages = new ArrayList<Object>();
 
-        public Object getEvent() {
-            return argument;
+        public List<Object> gotMessages() {
+            return messages;
         }
 
-        public void eventOccured(final Object argument) {
-            this.argument = argument;
+        public void eventOccured(final Object message) {
+            messages.add(message);
         }
     }
 
@@ -34,8 +37,8 @@ public class TestSendEventWithArgumentsWithGuice
             this.listener = listener;
         }
 
-        public void triggerSendNow(final Object argument) {
-            listener.eventOccured(argument);
+        public void triggerSendNow(final Object message) {
+            listener.eventOccured(message);
         }
     }
 
@@ -50,8 +53,13 @@ public class TestSendEventWithArgumentsWithGuice
 
         final Object message = new Object();
 
-        final Receiver receiver = injector.getInstance(Receiver.class);
+        final Receiver receiverOne = injector.getInstance(Receiver.class);
+        final Receiver receiverTwo = injector.getInstance(Receiver.class);
+
         injector.getInstance(Sender.class).triggerSendNow(message);
-        assertThat(receiver.getEvent(), sameInstance(message));
+
+        assertThat(receiverOne, not(sameInstance(receiverTwo)));
+        assertThat(receiverOne.gotMessages(), contains(message));
+        assertThat(receiverTwo.gotMessages(), contains(message));
     }
 }

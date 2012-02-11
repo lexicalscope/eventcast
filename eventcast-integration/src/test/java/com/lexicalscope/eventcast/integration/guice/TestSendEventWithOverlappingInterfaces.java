@@ -1,4 +1,4 @@
-package com.lexicalscope.eventcast.integration;
+package com.lexicalscope.eventcast.integration.guice;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -12,7 +12,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.lexicalscope.eventcast.EventCastModuleBuilder;
 
-public class TestSendEventWithOverlappingInterfacesWithGuice
+public class TestSendEventWithOverlappingInterfaces
 {
     public interface MyEventListenerOne {
         void eventOccured(Object message);
