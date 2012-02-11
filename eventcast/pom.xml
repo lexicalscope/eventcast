@@ -48,46 +48,70 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>jarjar-maven-plugin</artifactId>
                 <version>1.5</version>
-                <configuration>
-                    <artifactSet>
-                        <includes>
-                            <include>com.google.guava:guava</include>
-                        </includes>
-                    </artifactSet>
-                    <relocations>
-                        <relocation>
-                            <pattern>com.google.common</pattern>
-                            <shadedPattern>com.lexicalscope.eventcast.guava</shadedPattern>
-                        </relocation>
-                    </relocations>
-                    <createSourcesJar>true</createSourcesJar>
-                    <minimizeJar>true</minimizeJar>
-                    <filters>
-                        <filter>
-                            <artifact>com.google.guava:guava</artifact>
+                <executions>
+                    <execution>
+                        <id>jarjar-classes</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>jarjar</goal>
+                        </goals>
+                        <configuration>
+                            <input>{classes}</input>
+                            <overwrite>true</overwrite>
                             <includes>
-                                <include>com/google/common/collect/LinkedHashMultimap.class</include>
-                                <include>com/google/common/collect/SetMultimap.class</include>
-                                <include>com/google/common/collect/Multimaps.class</include>
+                                <include>com.google.guava:guava</include>
                             </includes>
-                            <excludes>
-                                <exclude>org/junit/experimental/**</exclude>
-                                <exclude>org/junit/runners/**</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
-                </configuration>
+                            <rules>
+                                <rule>
+                                    <pattern>com.google.common.**.*</pattern>
+                                    <result>com.lexicalscope.eventcast.internal.guava.@1.$@2</result>
+                                </rule>
+                                <rule>
+                                    <pattern>com.google.common.*</pattern>
+                                    <result>com.lexicalscope.eventcast.internal.guava.$@1</result>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.pyx4me</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.0.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>proguard</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                <includeDependency>false</includeDependency>
+                    <options>
+                        <option>-allowaccessmodification</option>
+                        <option>-dontobfuscate</option>
+                        <option>-dontoptimize</option>
+                        <option>-dontnote</option>
+                        <option>-dontwarn</option>
+                        <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod</option>
+                        <option>-keep public class com.lexicalscope.eventcast.* { public protected *; }</option>
+                        <option>-keepclassmembernames class com.lexicalscope.eventcast.* { java.lang.Class class$(java.lang.String); java.lang.Class
+                            class$(java.lang.String, boolean); }</option>
+                        <option>-keepclassmembers enum com.lexicalscope.eventcast.* { public static **[] values(); public static **
+                            valueOf(java.lang.String); }</option>
+                        <option>-keepclassmembers class com.lexicalscope.eventcast.* implements java.io.Serializable { static final long serialVersionUID;
+                            private static final java.io.ObjectStreamField[] serialPersistentFields; private void writeObject(java.io.ObjectOutputStream);
+                            private void readObject(java.io.ObjectInputStream); java.lang.Object writeReplace(); java.lang.Object readResolve(); }</option>
+                    </options>
+                    <libs>
+                        <lib>${java.home}/lib/rt.jar</lib>
+                    </libs>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -113,7 +137,6 @@
                             <includes>
                                 <include>**/integration/**/*.java</include>
                             </includes>
-                            <classpathDependencyScopeExclude>runtime</classpathDependencyScopeExclude>
                         </configuration>
                     </execution>
                 </executions>
@@ -150,6 +173,7 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>11.0.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <profiles>
