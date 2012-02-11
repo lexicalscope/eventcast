@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.lexicalscope.eventcast</groupId>
         <artifactId>eventcast-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0.0-RC1</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
