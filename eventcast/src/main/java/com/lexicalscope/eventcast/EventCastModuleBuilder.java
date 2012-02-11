@@ -25,6 +25,10 @@ import com.google.inject.TypeLiteral;
 public class EventCastModuleBuilder {
     private final Set<TypeLiteral<?>> bindings = new LinkedHashSet<TypeLiteral<?>>();
 
+    public EventCastModuleBuilder() {
+        bindings.add(TypeLiteral.get(EventCastingExceptionListener.class));
+    }
+
     public EventCastModuleBuilder implement(final Class<?> source) {
         return implement(TypeLiteral.get(source));
     }

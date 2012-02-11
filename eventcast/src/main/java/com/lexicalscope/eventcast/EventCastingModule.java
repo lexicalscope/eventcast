@@ -34,6 +34,8 @@ final class EventCastingModule extends AbstractModule {
     }
 
     @Override protected void configure() {
+        bind(EventCaster.class).toInstance(eventCaster);
+
         bindListener(Matchers.any(), new TypeListener() {
             public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
                 final Class<? super I> rawType = type.getRawType();

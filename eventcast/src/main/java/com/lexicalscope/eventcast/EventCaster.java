@@ -4,6 +4,7 @@ import static com.google.common.collect.Multimaps.synchronizedSetMultimap;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +39,6 @@ class EventCaster {
 
     void fire(final TypeLiteral<?> listenerType, final Method method, final Object[] args) throws Throwable {
         final Event event = new Event(listenerType, method, args);
-
         if (pending.get() == null) {
             final List<Event> pendingEvents = new LinkedList<Event>();
             pendingEvents.add(event);
@@ -55,9 +55,27 @@ class EventCaster {
             pending.get().add(event);
         }
     }
-    private void broadcastEvent(final Event oldestEvent) throws IllegalAccessException, InvocationTargetException {
-        for (final Object object : new ArrayList<Object>(listeners.get(oldestEvent.listenerType))) {
-            oldestEvent.method.invoke(object, oldestEvent.args);
+
+    private void broadcastEvent(final Event event) throws Throwable {
+        for (final Object object : new ArrayList<Object>(listeners.get(event.listenerType))) {
+            try {
+                event.method.invoke(object, event.args);
+            } catch (final InvocationTargetException e) {
+                fireExceptionDuringEventCast(event, object, e.getCause());
+            } catch (final Exception e) {
+                fireExceptionDuringEventCast(event, object, e);
+            }
         }
+    }
+
+    private void fireExceptionDuringEventCast(final Event event, final Object object, final Throwable e)
+            throws Throwable,
+            NoSuchMethodException {
+        fire(
+                TypeLiteral.get(EventCastingExceptionListener.class),
+                EventCastingExceptionListener.class.getMethod(
+                        "exceptionDuringEventCast",
+                        new Class[] { Throwable.class, Type.class, Object.class, Method.class, Object[].class }),
+                new Object[] { e, event.listenerType.getType(), object, event.method, event.args });
     }
 }

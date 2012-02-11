@@ -103,12 +103,9 @@ public class TestRecursiveSendEventIsReordered
             }
         });
 
-        final Object message = new Object();
-
-        final ReceiverThatSendsFromFirstToSecond receiverThree =
-                injector.getInstance(ReceiverThatSendsFromFirstToSecond.class);
-        final FirstReceiver receiverOne = injector.getInstance(FirstReceiver.class);
-        final SecondReceiver receiverTwo = injector.getInstance(SecondReceiver.class);
+        injector.getInstance(ReceiverThatSendsFromFirstToSecond.class);
+        injector.getInstance(FirstReceiver.class);
+        injector.getInstance(SecondReceiver.class);
 
         injector.getInstance(Sender.class).triggerSendNow("original message");
 

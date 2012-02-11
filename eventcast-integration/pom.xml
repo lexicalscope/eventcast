@@ -43,6 +43,12 @@
         <developerConnection>scm:git:git@github.com:lexicalscope/contest.git</developerConnection>
     </scm>
     <dependencies>
+    <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>11.0.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.lexicalscope.eventcast</groupId>
             <artifactId>eventcast</artifactId>
