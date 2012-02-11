@@ -41,9 +41,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:lexicalscope/contest.git</connection>
-        <url>https://github.com/lexicalscope/contest</url>
-        <developerConnection>scm:git:git@github.com:lexicalscope/contest.git</developerConnection>
+        <connection>scm:git:git@github.com:lexicalscope/eventcast.git</connection>
+        <url>https://github.com/lexicalscope/eventcast</url>
+        <developerConnection>scm:git:git@github.com:lexicalscope/eventcast.git</developerConnection>
     </scm>
     <modules>
        <module>eventcast</module>
