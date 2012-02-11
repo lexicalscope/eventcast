@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.lexicalscope.eventcast</groupId>
     <artifactId>eventcast-parent</artifactId>
-    <version>1.0.0-RC2</version>
+    <version>1.0.0-RC3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>eventcast parent</name>
     <url>http://maven.apache.org</url>
