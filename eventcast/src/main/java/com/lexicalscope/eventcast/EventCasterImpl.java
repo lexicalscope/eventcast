@@ -1,17 +1,11 @@
 package com.lexicalscope.eventcast;
 
-import static com.google.common.collect.Multimaps.synchronizedSetMultimap;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.SetMultimap;
 import com.google.inject.TypeLiteral;
 
 /*
@@ -32,15 +26,14 @@ import com.google.inject.TypeLiteral;
 
 class EventCasterImpl implements EventCasterInternal {
     private final ThreadLocal<List<Event>> pending = new ThreadLocal<List<Event>>();
-    private final SetMultimap<TypeLiteral<?>, Object> listeners = synchronizedSetMultimap(LinkedHashMultimap
-            .<TypeLiteral<?>, Object>create());
+    private final EventListenersMultimap listeners = new EventListenersMultimap();
 
     public EventCasterImpl() {
         registerListener(TypeLiteral.get(EventCaster.class), this);
     }
 
     @Override public void registerListener(final TypeLiteral<?> interfaceType, final Object injectee) {
-        listeners.put(interfaceType, injectee);
+        listeners.register(interfaceType, injectee);
     }
 
     @Override public void fire(final TypeLiteral<?> listenerType, final Method method, final Object[] args)
@@ -64,7 +57,7 @@ class EventCasterImpl implements EventCasterInternal {
     }
 
     private void broadcastEvent(final Event event) throws Throwable {
-        final ArrayList<Object> listenersForThisEvent = new ArrayList<Object>(listeners.get(event.listenerType));
+        final List<Object> listenersForThisEvent = listeners.copyListenersFor(event.listenerType);
         for (final Object object : listenersForThisEvent) {
             try {
                 event.method.invoke(object, event.args);
@@ -105,16 +98,14 @@ class EventCasterImpl implements EventCasterInternal {
     }
 
     @Override public void unregister(final Object listener) {
-        final Collection<Object> listenerObjects = listeners.values();
-        while (listenerObjects.remove(listener))
-        {}
+        listeners.unregister(listener);
     }
 
     @Override public void unregister(final TypeLiteral<?> type, final Object listener) {
-        listeners.remove(type, listener);
+        listeners.unregister(type, listener);
     }
 
     @Override public void unregister(final Class<?> type, final Object listener) {
-        listeners.remove(TypeLiteral.get(type), listener);
+        unregister(TypeLiteral.get(type), listener);
     }
 }
