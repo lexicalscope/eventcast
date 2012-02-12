@@ -51,7 +51,7 @@ public class TestSendEventWithGuice
             @Override protected void configure() {
                 bind(Sender.class).to(SenderImpl.class);
                 bind(Receiver.class).to(ReceiverImpl.class);
-                install(new EventCastModuleBuilderImpl().implement(MyEventListener.class).build());
+                install(EventCast.eventCastModuleBuilder().implement(MyEventListener.class).build());
             }
         });
 
