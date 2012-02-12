@@ -62,7 +62,7 @@ class EventCastModuleBuilderImpl implements EventCastModuleBuilder {
     @Override public Module build() {
         return new AbstractModule() {
             @Override protected void configure() {
-                install(new EventCastingModule());
+                install(new EventCasterModule());
                 install(new EventCastBindingModule(new LinkedHashSet<TypeLiteral<?>>(bindings)));
             }
         };

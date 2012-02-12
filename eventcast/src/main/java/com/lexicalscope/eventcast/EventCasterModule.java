@@ -18,10 +18,11 @@ import com.google.inject.AbstractModule;
  * limitations under the License. 
  */
 
-final class EventCastingModule extends AbstractModule {
+final class EventCasterModule extends AbstractModule {
     private final EventCasterImpl eventCaster = new EventCasterImpl();
 
     @Override protected void configure() {
         bind(EventCaster.class).toInstance(eventCaster);
+        bind(EventCasterInternal.class).toInstance(eventCaster);
     }
 }

@@ -39,11 +39,32 @@ package com.lexicalscope.eventcast;
  * @author tim
  */
 public class EventCast {
+    /**
+     * This module will bind the EventCaster and any listeners you bind to the
+     * builder.
+     * 
+     * If you want to use the EventCaster in your Injector, you must install a
+     * module built by this method exactly once.
+     * 
+     * @return A module builder that will bind the EventCaster and any listeners
+     *         you specify
+     */
     public static EventCastModuleBuilder eventCastModuleBuilder()
     {
         return new EventCastModuleBuilderImpl();
     }
 
+    /**
+     * This module will bind any listeners you bind to the builder. It will not
+     * bind the EventCaster. You can use this method if you want to bind
+     * listener interfaces in multiple modules without binding the EventCaster
+     * more than once.
+     * 
+     * If you want to use the EventCaster in your Injector, you must install a
+     * module built by the {@code eventCastModuleBuilder()} method as well.
+     * 
+     * @return A module builder that will bind only the listeners you specify
+     */
     public static EventCastModuleBuilder eventCastBindingModuleBuilder()
     {
         return new EventCastBindingModuleBuilderImpl();

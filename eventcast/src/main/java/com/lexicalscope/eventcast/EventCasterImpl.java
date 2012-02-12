@@ -30,7 +30,7 @@ import com.google.inject.TypeLiteral;
  * limitations under the License. 
  */
 
-class EventCasterImpl implements EventCaster {
+class EventCasterImpl implements EventCasterInternal {
     private final ThreadLocal<List<Event>> pending = new ThreadLocal<List<Event>>();
     private final SetMultimap<TypeLiteral<?>, Object> listeners = synchronizedSetMultimap(LinkedHashMultimap
             .<TypeLiteral<?>, Object>create());

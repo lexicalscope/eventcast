@@ -25,9 +25,9 @@ import com.google.inject.TypeLiteral;
 
 class EventCastProvider<T> implements Provider<T>, InvocationHandler {
     private final TypeLiteral<T> listenerType;
-    private final Provider<EventCaster> eventCaster;
+    private final Provider<EventCasterInternal> eventCaster;
 
-    EventCastProvider(final TypeLiteral<T> listenerType, final Provider<EventCaster> eventCasterProvider) {
+    EventCastProvider(final TypeLiteral<T> listenerType, final Provider<EventCasterInternal> eventCasterProvider) {
         this.listenerType = listenerType;
         this.eventCaster = eventCasterProvider;
     }

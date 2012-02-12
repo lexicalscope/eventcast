@@ -41,7 +41,8 @@ final class EventCastBindingModule extends AbstractModule {
                     final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
                     if (bindings.contains(interfaceType))
                     {
-                        final Provider<EventCaster> eventCasterProvider = encounter.getProvider(EventCaster.class);
+                        final Provider<EventCasterInternal> eventCasterProvider =
+                                encounter.getProvider(EventCasterInternal.class);
                         encounter.register(new InjectionListener<I>() {
                             public void afterInjection(final Object injectee) {
                                 eventCasterProvider.get().registerListener(interfaceType, injectee);
@@ -58,6 +59,6 @@ final class EventCastBindingModule extends AbstractModule {
     }
 
     private <T> void bindEventCast(final TypeLiteral<T> listener) {
-        bind(listener).toProvider(new EventCastProvider<T>(listener, getProvider(EventCaster.class)));
+        bind(listener).toProvider(new EventCastProvider<T>(listener, getProvider(EventCasterInternal.class)));
     }
 }
