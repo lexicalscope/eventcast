@@ -94,6 +94,12 @@ public class TestMultipleGuiceModules
         sender.triggerSendNow(message);
         assertThat(receiver.getMessages(), contains(message));
 
+        final Receiver2 receiver2 = injector.getInstance(Receiver2.class);
+        final Sender2 sender2 = injector.getInstance(Sender2.class);
+
+        sender2.triggerSendNow(message);
+        assertThat(receiver2.getMessages(), contains(message));
+
         injector.getInstance(EventCaster.class).unregister(receiver);
 
         sender.triggerSendNow(new Object());
