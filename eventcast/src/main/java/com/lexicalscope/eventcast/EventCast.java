@@ -43,4 +43,9 @@ public class EventCast {
     {
         return new EventCastModuleBuilderImpl();
     }
+
+    public static EventCastModuleBuilder eventCastBindingModuleBuilder()
+    {
+        return new EventCastBindingModuleBuilderImpl();
+    }
 }

@@ -36,14 +36,15 @@ class EventCasterImpl implements EventCaster {
             .<TypeLiteral<?>, Object>create());
 
     public EventCasterImpl() {
-        addListener(TypeLiteral.get(EventCaster.class), this);
+        registerListener(TypeLiteral.get(EventCaster.class), this);
     }
 
-    void addListener(final TypeLiteral<?> interfaceType, final Object injectee) {
+    @Override public void registerListener(final TypeLiteral<?> interfaceType, final Object injectee) {
         listeners.put(interfaceType, injectee);
     }
 
-    void fire(final TypeLiteral<?> listenerType, final Method method, final Object[] args) throws Throwable {
+    @Override public void fire(final TypeLiteral<?> listenerType, final Method method, final Object[] args)
+            throws Throwable {
         final Event event = new Event(listenerType, method, args);
         if (pending.get() == null) {
             final List<Event> pendingEvents = new LinkedList<Event>();

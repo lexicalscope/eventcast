@@ -3,7 +3,6 @@ package com.lexicalscope.eventcast;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 
@@ -23,13 +22,8 @@ import com.google.inject.TypeLiteral;
  * limitations under the License. 
  */
 
-class EventCastModuleBuilderImpl implements EventCastModuleBuilder {
+class EventCastBindingModuleBuilderImpl implements EventCastModuleBuilder {
     private final Set<TypeLiteral<?>> bindings = new LinkedHashSet<TypeLiteral<?>>();
-
-    EventCastModuleBuilderImpl() {
-        bindings.add(TypeLiteral.get(EventCastingExceptionListener.class));
-        bindings.add(TypeLiteral.get(EventCastUnhandledListener.class));
-    }
 
     /*
      * (non-Javadoc)
@@ -60,11 +54,6 @@ class EventCastModuleBuilderImpl implements EventCastModuleBuilder {
      * @see com.lexicalscope.eventcast.EventCastModuleBuilder#build()
      */
     @Override public Module build() {
-        return new AbstractModule() {
-            @Override protected void configure() {
-                install(new EventCastingModule());
-                install(new EventCastBindingModule(new LinkedHashSet<TypeLiteral<?>>(bindings)));
-            }
-        };
+        return new EventCastBindingModule(new LinkedHashSet<TypeLiteral<?>>(bindings));
     }
 }

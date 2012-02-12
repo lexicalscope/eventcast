@@ -25,11 +25,11 @@ import com.google.inject.TypeLiteral;
 
 class EventCastProvider<T> implements Provider<T>, InvocationHandler {
     private final TypeLiteral<T> listenerType;
-    private final EventCasterImpl eventCaster;
+    private final Provider<EventCaster> eventCaster;
 
-    EventCastProvider(final TypeLiteral<T> listenerType, final EventCasterImpl eventCaster) {
+    EventCastProvider(final TypeLiteral<T> listenerType, final Provider<EventCaster> eventCasterProvider) {
         this.listenerType = listenerType;
-        this.eventCaster = eventCaster;
+        this.eventCaster = eventCasterProvider;
     }
 
     @SuppressWarnings("unchecked") public T get() {
@@ -37,7 +37,7 @@ class EventCastProvider<T> implements Provider<T>, InvocationHandler {
     }
 
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        eventCaster.fire(listenerType, method, args);
+        eventCaster.get().fire(listenerType, method, args);
         return null;
     }
 }

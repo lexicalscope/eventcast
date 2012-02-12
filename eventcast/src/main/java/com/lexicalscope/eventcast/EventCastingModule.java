@@ -1,13 +1,6 @@
 package com.lexicalscope.eventcast;
 
-import java.util.Set;
-
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.spi.InjectionListener;
-import com.google.inject.spi.TypeEncounter;
-import com.google.inject.spi.TypeListener;
 
 /*
  * Copyright 2011 Tim Wood
@@ -26,39 +19,9 @@ import com.google.inject.spi.TypeListener;
  */
 
 final class EventCastingModule extends AbstractModule {
-    private final Set<TypeLiteral<?>> bindings;
     private final EventCasterImpl eventCaster = new EventCasterImpl();
-
-    public EventCastingModule(final Set<TypeLiteral<?>> bindings) {
-        this.bindings = bindings;
-    }
 
     @Override protected void configure() {
         bind(EventCaster.class).toInstance(eventCaster);
-
-        bindListener(Matchers.any(), new TypeListener() {
-            public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
-                final Class<? super I> rawType = type.getRawType();
-                for (final Class<?> interfaceClass : rawType.getInterfaces()) {
-                    final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
-                    if (bindings.contains(interfaceType))
-                    {
-                        encounter.register(new InjectionListener<I>() {
-                            public void afterInjection(final Object injectee) {
-                                eventCaster.addListener(interfaceType, injectee);
-                            }
-                        });
-                    }
-                }
-            }
-        });
-
-        for (final TypeLiteral<?> listener : bindings) {
-            bindEventCast(listener);
-        }
-    }
-
-    private <T> void bindEventCast(final TypeLiteral<T> listener) {
-        bind(listener).toProvider(new EventCastProvider<T>(listener, eventCaster));
     }
 }

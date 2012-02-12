@@ -1,5 +1,7 @@
 package com.lexicalscope.eventcast;
 
+import java.lang.reflect.Method;
+
 import com.google.inject.TypeLiteral;
 
 /*
@@ -24,6 +26,31 @@ import com.google.inject.TypeLiteral;
  * @author tim
  */
 public interface EventCaster {
+    /**
+     * Register this a listener instance with the EventCaster
+     * 
+     * @param type
+     *            the type of the listener
+     * @param listener
+     *            the listener to register
+     */
+    void registerListener(TypeLiteral<?> type, Object listener);
+
+    /**
+     * Fire an event to listeners of the given type
+     * 
+     * @param type
+     *            the type of listeners that will be notified
+     * @param method
+     *            the method that will be notified
+     * @param args
+     *            the message that is being sent
+     * 
+     * @throws Throwable
+     *             any exception
+     */
+    void fire(TypeLiteral<?> type, Method method, Object[] args) throws Throwable;
+
     /**
      * Unregister this listener from all events
      * 
