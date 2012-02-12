@@ -1,9 +1,10 @@
 package com.lexicalscope.eventcast;
 
-import com.google.inject.Module;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 
 /*
- * Copyright 2011 Tim Wood
+ * Copyright 2012 Tim Wood
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +19,8 @@ import com.google.inject.Module;
  * limitations under the License.
  */
 
-class EventCastBindingModuleBuilderImpl extends AbstractEventCastModuleBuilder {
-    @Override public Module build() {
-        return new EventCastBindingModule(bindings());
+class NullMethodInterceptor implements MethodInterceptor {
+    @Override public Object invoke(final MethodInvocation invocation) throws Throwable {
+        return invocation.proceed();
     }
 }

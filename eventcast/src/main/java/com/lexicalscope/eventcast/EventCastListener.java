@@ -1,9 +1,7 @@
 package com.lexicalscope.eventcast;
 
-import com.google.inject.Module;
-
 /*
- * Copyright 2011 Tim Wood
+ * Copyright 2012 Tim Wood
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +16,6 @@ import com.google.inject.Module;
  * limitations under the License.
  */
 
-class EventCastBindingModuleBuilderImpl extends AbstractEventCastModuleBuilder {
-    @Override public Module build() {
-        return new EventCastBindingModule(bindings());
-    }
+interface EventCastListener {
+    // just a marker so we can find our listener classes
 }

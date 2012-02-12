@@ -1,6 +1,9 @@
 package com.lexicalscope.eventcast;
 
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.aopalliance.intercept.MethodInterceptor;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
@@ -23,21 +26,21 @@ import com.google.inject.matcher.Matchers;
  */
 
 final class EventCastBindingModule extends AbstractModule {
-     private final Set<TypeLiteral<?>> bindings;
+     private final Map<TypeLiteral<?>, MethodInterceptor> bindings;
 
-    public EventCastBindingModule(final Set<TypeLiteral<?>> bindings) {
+    public EventCastBindingModule(final Map<TypeLiteral<?>, MethodInterceptor> bindings) {
         this.bindings = bindings;
     }
 
     @Override protected void configure() {
-        bindListener(Matchers.any(), new EventListenerGuiceTypeListener(bindings));
+        bindListener(Matchers.any(), new EventListenerGuiceTypeListener(bindings.keySet()));
 
-        for (final TypeLiteral<?> listener : bindings) {
-            bindEventCast(listener);
+        for (final Entry<TypeLiteral<?>, MethodInterceptor> listener : bindings.entrySet()) {
+            bindEventCast(listener.getKey(), listener.getValue());
         }
     }
 
-    private <T> void bindEventCast(final TypeLiteral<T> listener) {
-        bind(listener).toProvider(new EventCastProvider<T>(listener, getProvider(EventCasterInternal.class)));
+    private <T> void bindEventCast(final TypeLiteral<T> listener, final MethodInterceptor interceptor) {
+        bind(listener).toProvider(new EventCastProvider<T>(listener, getProvider(EventCasterInternal.class), interceptor));
     }
 }

@@ -17,17 +17,15 @@ import com.google.inject.TypeLiteral;
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 
-class Event {
-    final TypeLiteral<?> listenerType;
-    final Method method;
-    final Object[] args;
+interface Event {
+    TypeLiteral<?> getListenerType();
 
-    public Event(final TypeLiteral<?> listenerType, final Method method, final Object[] args) {
-        this.listenerType = listenerType;
-        this.method = method;
-        this.args = args;
-    }
+    Method method();
+
+    Object[] args();
+
+    Object invoke(Object object) throws Throwable;
 }

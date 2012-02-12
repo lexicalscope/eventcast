@@ -21,7 +21,7 @@ import com.google.inject.TypeLiteral;
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 
 class EventCasterImpl implements EventCasterInternal {
@@ -36,9 +36,7 @@ class EventCasterImpl implements EventCasterInternal {
         listeners.register(interfaceType, injectee);
     }
 
-    @Override public void fire(final TypeLiteral<?> listenerType, final Method method, final Object[] args)
-            throws Throwable {
-        final Event event = new Event(listenerType, method, args);
+    @Override public void fire(final Event event) throws Throwable {
         if (pending.get() == null) {
             final List<Event> pendingEvents = new LinkedList<Event>();
             pendingEvents.add(event);
@@ -57,19 +55,19 @@ class EventCasterImpl implements EventCasterInternal {
     }
 
     private void broadcastEvent(final Event event) throws Throwable {
-        final List<Object> listenersForThisEvent = listeners.copyListenersFor(event.listenerType);
+        final List<Object> listenersForThisEvent = listeners.copyListenersFor(event.getListenerType());
         for (final Object object : listenersForThisEvent) {
             try {
-                event.method.invoke(object, event.args);
+                event.invoke(object);
             } catch (final InvocationTargetException e) {
                 fireExceptionDuringEventCast(event, object, e.getCause());
-            } catch (final Exception e) {
+            } catch (final Throwable e) {
                 fireExceptionDuringEventCast(event, object, e);
             }
         }
 
         if (listenersForThisEvent.isEmpty()
-                && !event.listenerType.equals(TypeLiteral.get(EventCastUnhandledListener.class)))
+                && !event.getListenerType().equals(TypeLiteral.get(EventCastUnhandledListener.class)))
         {
             fireUnhandledEventCast(event);
         }
@@ -78,23 +76,23 @@ class EventCasterImpl implements EventCasterInternal {
     private void fireExceptionDuringEventCast(final Event event, final Object object, final Throwable e)
             throws Throwable,
             NoSuchMethodException {
-        fire(
+        fire(new EventDirect(
                 TypeLiteral.get(EventCastingExceptionListener.class),
                 EventCastingExceptionListener.class.getMethod(
                         "exceptionDuringEventCast",
                         new Class[] { Throwable.class, Type.class, Object.class, Method.class, Object[].class }),
-                new Object[] { e, event.listenerType.getType(), object, event.method, event.args });
+                new Object[] { e, event.getListenerType().getType(), object, event.method(), event.args() }));
     }
 
     private void fireUnhandledEventCast(final Event event)
             throws Throwable,
             NoSuchMethodException {
-        fire(
+        fire(new EventDirect(
                 TypeLiteral.get(EventCastUnhandledListener.class),
                 EventCastUnhandledListener.class.getMethod(
                         "unhandledEventCast",
                         new Class[] { Type.class, Method.class, Object[].class }),
-                new Object[] { event.listenerType.getType(), event.method, event.args });
+                new Object[] { event.getListenerType().getType(), event.method(), event.args() }));
     }
 
     @Override public void unregister(final Object listener) {

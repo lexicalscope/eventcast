@@ -1,5 +1,7 @@
 package com.lexicalscope.eventcast;
 
+import java.lang.reflect.Method;
+
 import com.google.inject.TypeLiteral;
 
 /*
@@ -18,19 +20,13 @@ import com.google.inject.TypeLiteral;
  * limitations under the License.
  */
 
-interface EventCasterInternal extends EventCaster {
-    /**
-     * Register this a listener instance with the EventCaster
-     *
-     * @param type
-     *            the type of the listener
-     * @param listener
-     *            the listener to register
-     */
-    void registerListener(TypeLiteral<?> type, Object listener);
+class EventDirect implements Event {
+    final TypeLiteral<?> listenerType;
+    final Method method;
+    final Object[] args;
 
     /**
-     * Fire an event to listeners of the given type
+     * An event
      *
      * @param type
      *            the type of listeners that will be notified
@@ -38,9 +34,26 @@ interface EventCasterInternal extends EventCaster {
      *            the method that will be notified
      * @param args
      *            the message that is being sent
-     *
-     * @throws Throwable
-     *             any exception
      */
-    void fire(Event event) throws Throwable;
+    public EventDirect(final TypeLiteral<?> listenerType, final Method method, final Object[] args) {
+        this.listenerType = listenerType;
+        this.method = method;
+        this.args = args;
+    }
+
+    public Object invoke(final Object object) throws Exception {
+        return method.invoke(object, args);
+    }
+
+    @Override public TypeLiteral<?> getListenerType() {
+        return listenerType;
+    }
+
+    @Override public Method method() {
+        return method;
+    }
+
+    @Override public Object[] args() {
+        return args;
+    }
 }
