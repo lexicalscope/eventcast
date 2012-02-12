@@ -35,7 +35,6 @@ class AsyncMethodInterceptor implements MethodInterceptor {
                 try {
                     return invocation.proceed();
                 } catch (final Throwable e) {
-                    // report
                     throw new RuntimeException(e);
                 }
             }});

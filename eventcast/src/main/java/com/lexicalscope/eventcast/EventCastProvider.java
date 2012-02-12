@@ -44,7 +44,7 @@ class EventCastProvider<T> implements Provider<T>, InvocationHandler {
     }
 
     public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        eventCaster.get().fire(new EventIntercepted(listenerType, method, args, methodInterceptor));
+        eventCaster.get().fire(new EventIntercepted(eventCaster, listenerType, method, args, methodInterceptor));
         return null;
     }
 }

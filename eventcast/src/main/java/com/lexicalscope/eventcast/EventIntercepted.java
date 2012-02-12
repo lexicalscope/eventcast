@@ -1,11 +1,13 @@
 package com.lexicalscope.eventcast;
 
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 
 /*
@@ -29,6 +31,7 @@ class EventIntercepted implements Event {
     private final Method method;
     private final Object[] args;
     private final MethodInterceptor interceptor;
+    private final Provider<EventCasterInternal> eventCaster;
 
     /**
      * An event
@@ -43,10 +46,12 @@ class EventIntercepted implements Event {
      *            interceptor to apply to the event method invocations
      */
     EventIntercepted(
+            final Provider<EventCasterInternal> eventCaster,
             final TypeLiteral<?> listenerType,
             final Method method,
             final Object[] args,
             final MethodInterceptor interceptor) {
+        this.eventCaster = eventCaster;
         this.listenerType = listenerType;
         this.method = method;
         this.args = args;
@@ -55,8 +60,17 @@ class EventIntercepted implements Event {
 
     public Object invoke(final Object object) throws Throwable {
         return interceptor.invoke(new MethodInvocation() {
-            @Override public Object proceed() throws Throwable {
-                return method.invoke(object, args);
+            @Override public Object proceed() {
+                try {
+                    method.invoke(object, args);
+                } catch (final InvocationTargetException e) {
+                    eventCaster.get().fireExceptionDuringEventCast(EventIntercepted.this, object, e.getCause());
+                } catch (final RuntimeException e) {
+                    eventCaster.get().fireExceptionDuringEventCast(EventIntercepted.this, object, e);
+                } catch (final Exception e) {
+                    eventCaster.get().fireExceptionDuringEventCast(EventIntercepted.this, object, e);
+                }
+                return null;
             }
 
             @Override public Object getThis() {

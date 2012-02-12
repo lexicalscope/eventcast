@@ -32,15 +32,20 @@ interface EventCasterInternal extends EventCaster {
     /**
      * Fire an event to listeners of the given type
      *
-     * @param type
-     *            the type of listeners that will be notified
-     * @param method
-     *            the method that will be notified
-     * @param args
-     *            the message that is being sent
+     * @param event
+     *            the event that was fired
      *
      * @throws Throwable
      *             any exception
      */
     void fire(Event event) throws Throwable;
+
+    /**
+     * An error occurred during event dispatch
+     *
+     * @param event the event that was fired
+     * @param object the object that threw the exception
+     * @param cause the exception
+     */
+    void fireExceptionDuringEventCast(Event event, Object object, Throwable cause);
 }

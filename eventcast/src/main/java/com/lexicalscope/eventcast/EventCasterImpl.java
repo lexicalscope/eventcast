@@ -36,7 +36,7 @@ class EventCasterImpl implements EventCasterInternal {
         listeners.register(interfaceType, injectee);
     }
 
-    @Override public void fire(final Event event) throws Throwable {
+    @Override public void fire(final Event event) throws Exception {
         if (pending.get() == null) {
             final List<Event> pendingEvents = new LinkedList<Event>();
             pendingEvents.add(event);
@@ -54,7 +54,7 @@ class EventCasterImpl implements EventCasterInternal {
         }
     }
 
-    private void broadcastEvent(final Event event) throws Throwable {
+    private void broadcastEvent(final Event event) throws Exception {
         final List<Object> listenersForThisEvent = listeners.copyListenersFor(event.getListenerType());
         for (final Object object : listenersForThisEvent) {
             try {
@@ -73,20 +73,23 @@ class EventCasterImpl implements EventCasterInternal {
         }
     }
 
-    private void fireExceptionDuringEventCast(final Event event, final Object object, final Throwable e)
-            throws Throwable,
-            NoSuchMethodException {
-        fire(new EventDirect(
-                TypeLiteral.get(EventCastingExceptionListener.class),
-                EventCastingExceptionListener.class.getMethod(
-                        "exceptionDuringEventCast",
-                        new Class[] { Throwable.class, Type.class, Object.class, Method.class, Object[].class }),
-                new Object[] { e, event.getListenerType().getType(), object, event.method(), event.args() }));
+    @Override public void fireExceptionDuringEventCast(final Event event, final Object object, final Throwable cause) {
+        try {
+            fire(new EventDirect(
+                    TypeLiteral.get(EventCastingExceptionListener.class),
+                    EventCastingExceptionListener.class.getMethod(
+                            "exceptionDuringEventCast",
+                            new Class[] { Throwable.class, Type.class, Object.class, Method.class, Object[].class }),
+                    new Object[] { cause, event.getListenerType().getType(), object, event.method(), event.args() }));
+        } catch (final RuntimeException e) {
+            // nothing more we can do
+        } catch (final Exception e) {
+            // nothing more we can do
+        }
     }
 
     private void fireUnhandledEventCast(final Event event)
-            throws Throwable,
-            NoSuchMethodException {
+            throws Exception {
         fire(new EventDirect(
                 TypeLiteral.get(EventCastUnhandledListener.class),
                 EventCastUnhandledListener.class.getMethod(
