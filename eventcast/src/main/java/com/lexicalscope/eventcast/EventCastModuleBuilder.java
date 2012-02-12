@@ -38,7 +38,7 @@ public interface EventCastModuleBuilder {
     EventCastModuleBuilder implement(Class<?> listener);
 
     /**
-     * The module should provide an implementation of the given listener
+     * The module should provide an asynchronous implementation of the given listener
      *
      * @param listener
      *            the listener to implement
@@ -50,7 +50,7 @@ public interface EventCastModuleBuilder {
     EventCastModuleBuilder implement(Class<?> source, ExecutorService executorService);
 
     /**
-     * The module should provide an implementation of the given listener
+     * The module should provide an asynchronous implementation of the given listener
      *
      * @param listener
      *            the listener to implement
