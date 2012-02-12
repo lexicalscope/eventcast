@@ -111,7 +111,6 @@ public class TestRecursiveSendEventIsReordered
 
         final MessageSequence messageSequence = injector.getInstance(MessageSequence.class);
 
-        System.out.println(messageSequence.getMessages());
         assertThat(messageSequence.getMessages(), contains("original message", "original message", "nested send"));
     }
 }
