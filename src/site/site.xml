@@ -1,0 +1,21 @@
+<project name="eventcast">
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.1</version>
+  </skin>
+  <custom>
+    <fluidoSkin>
+      <gitHub>
+        <projectId>lexicalscope/eventcast</projectId>
+        <ribbonOrientation>right</ribbonOrientation>
+        <ribbonColor>black</ribbonColor>
+      </gitHub>
+    </fluidoSkin>
+  </custom>
+  <body>
+     <menu ref="parent" />
+     <menu ref="modules" />
+     <menu ref="reports" />
+  </body>
+</project>
