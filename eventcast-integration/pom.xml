@@ -42,6 +42,37 @@
         <url>https://github.com/lexicalscope/eventcast</url>
         <developerConnection>scm:git:git@github.com:lexicalscope/eventcast.git</developerConnection>
     </scm>
+    <build>
+       <plugins>
+          <plugin>
+             <groupId>com.github.github</groupId>
+             <artifactId>site-maven-plugin</artifactId>
+             <version>0.5</version>
+             <executions>
+                <execution>
+                   <goals>
+                      <goal>site</goal>
+                   </goals>
+                   <phase>site</phase>
+                   <configuration>
+                      <message>Creating site for ${project.version}</message>
+                      <path>eventcast-integration</path>
+                      <merge>true</merge>
+                   </configuration>
+                </execution>
+             </executions>
+          </plugin>
+       </plugins>
+       <pluginManagement>
+          <plugins>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.0</version>
+             </plugin>
+          </plugins>
+       </pluginManagement>
+    </build>
     <dependencies>
     <!-- 
         <dependency>

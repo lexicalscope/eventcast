@@ -49,6 +49,35 @@
        <module>eventcast</module>
        <module>eventcast-integration</module>
     </modules>
+    <build>
+       <plugins>
+          <plugin>
+             <groupId>com.github.github</groupId>
+             <artifactId>site-maven-plugin</artifactId>
+             <version>0.5</version>
+             <executions>
+                <execution>
+                   <goals>
+                      <goal>site</goal>
+                   </goals>
+                   <phase>site</phase>
+                   <configuration>
+                      <message>Creating site for ${project.version}</message>
+                   </configuration>
+                </execution>
+             </executions>
+          </plugin>
+       </plugins>
+       <pluginManagement>
+          <plugins>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.0</version>
+             </plugin>
+          </plugins>
+       </pluginManagement>
+    </build>
     <profiles>
         <profile>
             <id>release-sign-artifacts</id>
