@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
-import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -30,31 +29,52 @@ import com.google.inject.spi.TypeEncounter;
  */
 
 public class TestEventListenerGuiceTypeListener {
-    @Rule public final JUnitRuleMockery context = new JUnitRuleMockery();
-    private final Set<TypeLiteral<?>> bindings = new HashSet<TypeLiteral<?>>();
+	@Rule public final MyJUnitRuleMockery context = new MyJUnitRuleMockery();
 
-    @Mock private TypeEncounter<MyListenerImpl> encounter;
-    @Mock private Provider<EventCasterInternal> eventCasterProvider;
+	private final Set<TypeLiteral<?>> bindings = new HashSet<TypeLiteral<?>>();
 
-    interface MyListener
-    {
+	@Mock private Provider<EventCasterInternal> eventCasterProvider;
 
-    }
+	interface MyListener
+	{
 
-    static class MyListenerImpl implements MyListener
-    {
+	}
 
-    }
+	static class MyListenerImpl implements MyListener
+	{
 
-    @Test public void typesThatImplementARegisteredListenerInterfaceAreMonitoredForinjectio()
-    {
-        bindings.add(TypeLiteral.get(MyListener.class));
+	}
 
-        context.checking(new Expectations() {{
-            oneOf(encounter).getProvider(EventCasterInternal.class); will(returnValue(eventCasterProvider));
-            oneOf(encounter).register(new RegisterInjectedEventListeners<Object>(TypeLiteral.get(MyListener.class), eventCasterProvider));
-        }});
+	@Test public void typesThatImplementARegisteredListenerInterfaceAreMonitoredForInjection()
+	{
+		final TypeEncounter<MyListenerImpl> encounter = context.mock(new TypeLiteral<TypeEncounter<MyListenerImpl>>(){});
 
-        new EventListenerGuiceTypeListener(bindings).hear(TypeLiteral.get(MyListenerImpl.class), encounter);
-    }
+		bindings.add(TypeLiteral.get(MyListener.class));
+
+		context.checking(new Expectations() {{
+			oneOf(encounter).getProvider(EventCasterInternal.class); will(returnValue(eventCasterProvider));
+			oneOf(encounter).register(new RegisterInjectedEventListeners<Object>(TypeLiteral.get(MyListener.class), eventCasterProvider));
+		}});
+
+		new EventListenerGuiceTypeListener(bindings).hear(TypeLiteral.get(MyListenerImpl.class), encounter);
+	}
+
+	static class MyClassWhichExtendsMyListenerImpl extends MyListenerImpl
+	{
+	}
+
+	@Test public void typesThatHaveASuperClassWhichImplementARegisteredListenerInterfaceAreMonitoredForInjection() throws Exception
+	{
+		final TypeEncounter<MyClassWhichExtendsMyListenerImpl> encounter = context.mock(new TypeLiteral<TypeEncounter<MyClassWhichExtendsMyListenerImpl>>(){});
+
+		bindings.add(TypeLiteral.get(MyListener.class));
+
+		context.checking(new Expectations() {{
+			oneOf(encounter).getProvider(EventCasterInternal.class); will(returnValue(eventCasterProvider));
+			oneOf(encounter).register(new RegisterInjectedEventListeners<Object>(TypeLiteral.get(MyListener.class), eventCasterProvider));
+		}});
+
+		new EventListenerGuiceTypeListener(bindings).hear(TypeLiteral.get(MyClassWhichExtendsMyListenerImpl.class), encounter);
+	}
+
 }
