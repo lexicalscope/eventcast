@@ -24,22 +24,25 @@ import com.google.inject.spi.TypeListener;
  */
 
 final class EventListenerGuiceTypeListener implements TypeListener {
-    private final Set<TypeLiteral<?>> bindings;
+	private final Set<TypeLiteral<?>> bindings;
 
-    EventListenerGuiceTypeListener(final Set<TypeLiteral<?>> bindings) {
-        this.bindings = bindings;
-    }
+	EventListenerGuiceTypeListener(final Set<TypeLiteral<?>> bindings) {
+		this.bindings = bindings;
+	}
 
-    public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
-        final Class<? super I> rawType = type.getRawType();
-        for (final Class<?> interfaceClass : rawType.getInterfaces()) {
-            final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
-            if (bindings.contains(interfaceType))
-            {
-                final Provider<EventCasterInternal> eventCasterProvider =
-                        encounter.getProvider(EventCasterInternal.class);
-                encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
-            }
-        }
-    }
+	public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
+		Class<? super I> rawType = type.getRawType();
+		while (rawType != null) {
+			for (final Class<?> interfaceClass : rawType.getInterfaces()) {
+				final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
+				if (bindings.contains(interfaceType))
+				{
+					final Provider<EventCasterInternal> eventCasterProvider =
+							encounter.getProvider(EventCasterInternal.class);
+					encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
+				}
+			}
+			rawType = rawType.getSuperclass();
+		}
+	}
 }
