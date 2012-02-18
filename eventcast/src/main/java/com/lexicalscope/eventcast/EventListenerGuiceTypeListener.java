@@ -1,5 +1,8 @@
 package com.lexicalscope.eventcast;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import com.google.inject.Provider;
@@ -30,46 +33,41 @@ final class EventListenerGuiceTypeListener implements TypeListener {
 		this.bindings = bindings;
 	}
 
-
-
-	public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
-		Class<? super I> rawType = type.getRawType();
-		while (rawType != null) {
-			checkIfAnyInterfacesAreInBindings(rawType.getInterfaces(), type, encounter);
-			rawType = rawType.getSuperclass();
-		}
-	}
-
-
-
-    private <I> void checkIfAnyInterfacesAreInBindings(
-            final Class<?>[] interfaces,
-            final TypeLiteral<I> type,
-            final TypeEncounter<I> encounter)
-    {
-
-        for (final Class<?> interfaceClass : interfaces)
-        {
-            checkInterfaceWithBindings(type, encounter, interfaceClass);
-            checkIfAnyInterfacesAreInBindings(interfaceClass.getInterfaces(), type, encounter);
+    public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
+        for (final Class<?> interfaceClass : getAllInterfacesInInheritanceHierarchy(type.getRawType())) {
+            registerInterfaceIfInBindings(type, encounter, interfaceClass);
         }
-
     }
 
-
-
-    private <I> void checkInterfaceWithBindings(
-            final TypeLiteral<I> type,
-            final TypeEncounter<I> encounter,
-            final Class<?> interfaceChecking)
+    private <I> void registerInterfaceIfInBindings(final TypeLiteral<I> type,
+            final TypeEncounter<I> encounter, final Class<?> interfaceClass)
     {
-        final TypeLiteral<?> interfaceType = type.getSupertype(interfaceChecking);
+        final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
         if (bindings.contains(interfaceType))
         {
-        	final Provider<EventCasterInternal> eventCasterProvider =
-        			encounter.getProvider(EventCasterInternal.class);
-        	encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
+            final Provider<EventCasterInternal> eventCasterProvider =
+                    encounter.getProvider(EventCasterInternal.class);
+            encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
         }
+    }
+
+    private Collection<Class<?>> getAllInterfacesInInheritanceHierarchy(Class<?> rawType) {
+        final List<Class<?>> interfaces = new ArrayList<Class<?>>();
+        while (rawType != null) {
+            interfaces.addAll(listAllInterfacesInTree(rawType.getInterfaces()));
+            rawType = rawType.getSuperclass();
+        }
+        return interfaces;
+    }
+
+    private Collection<? extends Class<?>> listAllInterfacesInTree(final Class<?>[] rawInterfaces)
+    {
+        final List<Class<?>> interfaces = new ArrayList<Class<?>>();
+        for (final Class<?> interfaceType : rawInterfaces) {
+            interfaces.add(interfaceType);
+            interfaces.addAll(listAllInterfacesInTree(interfaceType.getInterfaces()));
+        }
+        return interfaces;
     }
 
 }
