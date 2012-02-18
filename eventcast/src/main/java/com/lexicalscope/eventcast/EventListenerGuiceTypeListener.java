@@ -30,19 +30,46 @@ final class EventListenerGuiceTypeListener implements TypeListener {
 		this.bindings = bindings;
 	}
 
+
+
 	public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
 		Class<? super I> rawType = type.getRawType();
 		while (rawType != null) {
-			for (final Class<?> interfaceClass : rawType.getInterfaces()) {
-				final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
-				if (bindings.contains(interfaceType))
-				{
-					final Provider<EventCasterInternal> eventCasterProvider =
-							encounter.getProvider(EventCasterInternal.class);
-					encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
-				}
-			}
+			checkIfAnyInterfacesAreInBindings(rawType.getInterfaces(), type, encounter);
 			rawType = rawType.getSuperclass();
 		}
 	}
+
+
+
+    private <I> void checkIfAnyInterfacesAreInBindings(
+            final Class<?>[] interfaces,
+            final TypeLiteral<I> type,
+            final TypeEncounter<I> encounter)
+    {
+
+        for (final Class<?> interfaceClass : interfaces)
+        {
+            checkInterfaceWithBindings(type, encounter, interfaceClass);
+            checkIfAnyInterfacesAreInBindings(interfaceClass.getInterfaces(), type, encounter);
+        }
+
+    }
+
+
+
+    private <I> void checkInterfaceWithBindings(
+            final TypeLiteral<I> type,
+            final TypeEncounter<I> encounter,
+            final Class<?> interfaceChecking)
+    {
+        final TypeLiteral<?> interfaceType = type.getSupertype(interfaceChecking);
+        if (bindings.contains(interfaceType))
+        {
+        	final Provider<EventCasterInternal> eventCasterProvider =
+        			encounter.getProvider(EventCasterInternal.class);
+        	encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
+        }
+    }
+
 }
