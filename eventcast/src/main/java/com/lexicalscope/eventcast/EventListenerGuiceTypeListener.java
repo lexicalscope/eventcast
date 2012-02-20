@@ -50,12 +50,10 @@ final class EventListenerGuiceTypeListener implements TypeListener {
     }
 
     private Collection<Class<?>> interfacesInInheritanceHierarchy(final Class<?> rawType) {
-        final Set<Class<?>> interfaces = new HashSet<Class<?>>();
-        listInterfaces(rawType, interfaces);
-        return new ArrayList<Class<?>>(interfaces);
+        return new ArrayList<Class<?>>(listInterfaces(rawType, new HashSet<Class<?>>()));
     }
 
-    private void listInterfaces(Class<?> rawType, final Set<Class<?>> interfaces) {
+    private Set<Class<?>> listInterfaces(Class<?> rawType, final Set<Class<?>> interfaces) {
         while(rawType != null)
         {
             for (final Class<?> interfac3 : rawType.getInterfaces()) {
@@ -65,5 +63,6 @@ final class EventListenerGuiceTypeListener implements TypeListener {
             }
             rawType = rawType.getSuperclass();
         }
+        return interfaces;
     }
 }
