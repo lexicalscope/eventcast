@@ -34,23 +34,22 @@ final class EventListenerGuiceTypeListener implements TypeListener {
 	}
 
     public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
-        for (final Class<?> interfaceClass : getAllInterfacesInInheritanceHierarchy(type.getRawType())) {
-            registerInterfaceIfInBindings(type, encounter, interfaceClass);
+        Provider<EventCasterInternal> eventCasterProvider = null;
+
+        for (final Class<?> interfaceClass : interfacesInInheritanceHierarchy(type.getRawType())) {
+            final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
+            if (bindings.contains(interfaceType))
+            {
+                if(eventCasterProvider == null)
+                {
+                    eventCasterProvider = encounter.getProvider(EventCasterInternal.class);
+                }
+                encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
+            }
         }
     }
 
-    private <I> void registerInterfaceIfInBindings(final TypeLiteral<I> type, final TypeEncounter<I> encounter, final Class<?> interfaceClass)
-    {
-        final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
-        if (bindings.contains(interfaceType))
-        {
-            final Provider<EventCasterInternal> eventCasterProvider =
-                    encounter.getProvider(EventCasterInternal.class);
-            encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
-        }
-    }
-
-    private Collection<Class<?>> getAllInterfacesInInheritanceHierarchy(final Class<?> rawType) {
+    private Collection<Class<?>> interfacesInInheritanceHierarchy(final Class<?> rawType) {
         final Set<Class<?>> interfaces = new HashSet<Class<?>>();
         listInterfaces(rawType, interfaces);
         return new ArrayList<Class<?>>(interfaces);
