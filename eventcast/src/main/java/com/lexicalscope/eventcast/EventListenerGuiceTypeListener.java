@@ -2,7 +2,7 @@ package com.lexicalscope.eventcast;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.google.inject.Provider;
@@ -39,8 +39,7 @@ final class EventListenerGuiceTypeListener implements TypeListener {
         }
     }
 
-    private <I> void registerInterfaceIfInBindings(final TypeLiteral<I> type,
-            final TypeEncounter<I> encounter, final Class<?> interfaceClass)
+    private <I> void registerInterfaceIfInBindings(final TypeLiteral<I> type, final TypeEncounter<I> encounter, final Class<?> interfaceClass)
     {
         final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
         if (bindings.contains(interfaceType))
@@ -51,23 +50,21 @@ final class EventListenerGuiceTypeListener implements TypeListener {
         }
     }
 
-    private Collection<Class<?>> getAllInterfacesInInheritanceHierarchy(Class<?> rawType) {
-        final List<Class<?>> interfaces = new ArrayList<Class<?>>();
-        while (rawType != null) {
-            interfaces.addAll(listAllInterfacesInTree(rawType.getInterfaces()));
+    private Collection<Class<?>> getAllInterfacesInInheritanceHierarchy(final Class<?> rawType) {
+        final Set<Class<?>> interfaces = new HashSet<Class<?>>();
+        listInterfaces(rawType, interfaces);
+        return new ArrayList<Class<?>>(interfaces);
+    }
+
+    private void listInterfaces(Class<?> rawType, final Set<Class<?>> interfaces) {
+        while(rawType != null)
+        {
+            for (final Class<?> interfac3 : rawType.getInterfaces()) {
+                if (interfaces.add(interfac3)) {
+                    listInterfaces(interfac3, interfaces);
+                }
+            }
             rawType = rawType.getSuperclass();
         }
-        return interfaces;
     }
-
-    private Collection<? extends Class<?>> listAllInterfacesInTree(final Class<?>[] rawInterfaces)
-    {
-        final List<Class<?>> interfaces = new ArrayList<Class<?>>();
-        for (final Class<?> interfaceType : rawInterfaces) {
-            interfaces.add(interfaceType);
-            interfaces.addAll(listAllInterfacesInTree(interfaceType.getInterfaces()));
-        }
-        return interfaces;
-    }
-
 }
