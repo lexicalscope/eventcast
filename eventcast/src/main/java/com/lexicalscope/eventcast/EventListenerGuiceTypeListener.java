@@ -1,7 +1,5 @@
 package com.lexicalscope.eventcast;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,7 +34,7 @@ final class EventListenerGuiceTypeListener implements TypeListener {
     public <I> void hear(final TypeLiteral<I> type, final TypeEncounter<I> encounter) {
         Provider<EventCasterInternal> eventCasterProvider = null;
 
-        for (final Class<?> interfaceClass : interfacesInInheritanceHierarchy(type.getRawType())) {
+        for (final Class<?> interfaceClass : listInterfaces(type.getRawType(), new HashSet<Class<?>>())) {
             final TypeLiteral<?> interfaceType = type.getSupertype(interfaceClass);
             if (bindings.contains(interfaceType))
             {
@@ -47,10 +45,6 @@ final class EventListenerGuiceTypeListener implements TypeListener {
                 encounter.register(new RegisterInjectedEventListeners<I>(interfaceType, eventCasterProvider));
             }
         }
-    }
-
-    private Collection<Class<?>> interfacesInInheritanceHierarchy(final Class<?> rawType) {
-        return new ArrayList<Class<?>>(listInterfaces(rawType, new HashSet<Class<?>>()));
     }
 
     private Set<Class<?>> listInterfaces(Class<?> rawType, final Set<Class<?>> interfaces) {
